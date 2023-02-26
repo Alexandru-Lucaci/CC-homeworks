@@ -11,6 +11,12 @@
 
 /?name=test&type=test&film=test&checked=on - add a raw to the html table. checked=on means that it will not duplicates 
 
+## PUT
+
+/?"name='name'&newname='NewName'&newtype='NewType'&newfilm='NewFile'"
+
+/?"id='id'&newname='NewName'&newtype='NewType'&newfilm='NewFilm"
+
 ## Ngrok command 
 
  ngrok.exe http 8000 
