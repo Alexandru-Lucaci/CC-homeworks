@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Bootstrap demo</title>
+<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" rel="stylesheet"/>
+</head>
+<body class="container">
+<!-- first page -->
+<div class="container-fluid p-5 bg-primary text-white text-center">
+<h1>Our film blog</h1>
+<p>Here we can find the list of our films</p>
+</div>
+<table class="table table-dark table-hover">
+<thead>
+<tr>
+<th scope="col">#</th>
+<th scope="col">Name of the film</th>
+<th scope="col">Type of the film</th>
+<th scope="col">Film genre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">1</th>
+<td>The Godfather</td>
+<td>Crime</td>
+<td>Drama</td>
+</tr>
+<tr>
+<th scope="row">2</th>
+<td>Star Wars: A New Hope</td>
+<td>Science Fiction</td>
+<td>Action</td>
+</tr>
+<tr>
+<th scope="row">3</th>
+<td>The Shawshank Redemption</td>
+<td>Drama</td>
+<td>Crime</td>
+</tr>
+<tr>
+<th scope="row">4</th>
+<td>Toy Story</td>
+<td>Animated</td>
+<td>Comedy</td>
+</tr>
+<tr>
+<th scope="row">5</th>
+<td>Forrest Gump</td>
+<td>Drama</td>
+<td>Romance</td>
+</tr>
+<tr>
+<th scope="row">6</th>
+<td>The Matrix</td>
+<td>Science Fiction</td>
+<td>Action</td>
+</tr>
+<tr>
+<th scope="row">7</th>
+<td>The Lord of the Rings: The Fellowship of the Ring</td>
+<td>Fantasy</td>
+<td>Action</td>
+</tr>
+<tr>
+<th scope="row">8</th>
+<td>Indiana Jones and the Raiders of the Lost Ark</td>
+<td>Adventure</td>
+<td>Action</td>
+</tr>
+<tr>
+<th scope="row">9</th>
+<td>Jurassic Park</td>
+<td>Science Fiction</td>
+<td>Action</td>
+</tr>
+<tr>
+<th scope="row">10</th>
+<td>Black Panther</td>
+<td>Superhero</td>
+<td>Action</td>
+</tr>
+<tr>
+<th scope="row">11</th>
+<td>Harry Potter and the Philosopher's Stone</td>
+<td>Fantasy</td>
+<td>Adventure</td>
+</tr>
+<tr>
+<th scope="row">12</th>
+<td>Guardians of the Galaxy</td>
+<td>Superhero</td>
+<td>Action</td>
+</tr>
+<tr>
+<th scope="row">13</th>
+<td>test</td>
+<td>test</td>
+<td>test</td>
+</tr>
+<tr>
+<th scope="row">14</th>
+<td>test</td>
+<td>test</td>
+<td>test</td>
+</tr>
+<tr>
+                <th scope="row">15</th>
+                <td>test</td>
+                <td>test</td>
+                <td>test</td>
+                </tr></tbody>
+</table>
+<!-- input a film -->
+<div class="container-fluid p-5 bg-primary text-white text-center">
+<h1>Input a film</h1>
+<p>Here we can input a film</p>
+</div>
+<form action="" method="post">
+<div class="mb-3">
+<label class="form-label" for="exampleInputNameFilm">Name of the film</label>
+<input class="form-control" id="exampleInputNameFilm" name="name" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="exampleInputType">
+          Type of the film
+        </label>
+<input class="form-control" id="exampleInputType" name="type" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="exampleInputType">Film genre </label>
+<input class="form-control" id="exampleInputType" name="film" type="text"/>
+</div>
+<div class="mb-3 form-check">
+<input class="form-check-input" id="exampleCheck1" name="checked" type="checkbox"/>
+<label class="form-check-label" for="exampleCheck1">Check if already exists</label>
+</div>
+<button class="btn btn-primary" type="submit">Introdu</button>
+</form>
+<br/>
+<div class="container-fluid p-5 bg-primary text-white text-center">
+<h1>Modify a film</h1>
+<p>Here we can modify a film</p>
+</div>
+<form action="" method="put">
+<input ,="" ,name="_method" type="hidden" value="put"/>
+<div class="mb-3">
+<label class="form-label" for="exampleInputNameFilm">Name of the film</label>
+<input class="form-control" id="exampleInputNameFilm" name="name" type="text">
+</input></div>
+<div class="mb-3">
+<label class="form-label" for="exampleInputNameFilm">New Name of the film</label>
+<input class="form-control" id="exampleInputNameFilm" name="NewName" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="exampleInputType">
+          New Type of the film
+        </label>
+<input class="form-control" id="exampleInputType" name="NewType" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="exampleInputType">New Film genre </label>
+<input class="form-control" id="exampleInputType" name="NewFilm" type="text"/>
+</div>
+<div class="mb-3 form-check">
+<input class="form-check-input" id="exampleCheck1" name="checked" type="checkbox"/>
+<button class="btn btn-primary" type="submit">Schimba</button>
+</div></form>
+<script crossorigin="anonymous" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
