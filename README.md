@@ -1,1 +1,1 @@
-# CC-homeworks
+# CC-homework
