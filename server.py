@@ -210,8 +210,8 @@ class NeuralHttp(BaseHTTPRequestHandler):
             self.do_GET()
 
     def do_PUT(self):
-        # "name='alex'&newname='ceva'&newtype='da'&newfilm=ceva"
-        # id='1'&newname='ceva'&newtype='da'&newfilm=ceva
+        # "name='alex'"
+        # id='1'
 
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -383,6 +383,92 @@ class NeuralHttp(BaseHTTPRequestHandler):
                                "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
                     self.wfile.write(bytes(str(message), 'utf-8'))
                     self.do_GET()
+
+    def do_DELETE(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        # <--- Gets the size of data
+        content_length = int(self.headers['Content-Length'])
+        # <--- Gets the data itself
+
+        post_data = self.rfile.read(content_length)
+        post_data = post_data.decode('utf-8')
+
+        print(post_data)
+        post_data = post_data.replace(
+            ' ', '').replace('"', '').replace("'", '')
+        post_data = post_data.split("&")
+        post_data = [i.replace("+", " ") for i in post_data]
+        post_data = {i.split("=")[0]: i.split("=")[1] for i in post_data}
+
+        print(post_data)
+
+        headers = get_header()
+        print(headers)
+        data = get_data()
+        print(data)
+        if post_data.get('id') is not None:
+            if data[post_data['id']] is not None:
+                soup = BeautifulSoup(open("index.html"), "html.parser")
+                table = soup.find("tbody")
+                # iterate through the table
+                for i in table.find_all('tr'):
+                    # check if the id is the same
+                    if i.find('th').text == post_data['id']:
+                        i.decompose()
+                        break
+
+                with open("index.html", "w") as file:
+                    file.write(str(soup).replace(
+                        "&lt;", "<").replace("&gt;", ">"))
+                    message = {"message": "Film deleted",
+                               "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                    self.wfile.write(bytes(str(message), 'utf-8'))
+                    self.path = '/index.html'
+                    self.do_GET()
+            else:
+                print('not found')
+                message = {"message": "Film not found",
+                           "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                self.wfile.write(bytes(str(message), 'utf-8'))
+                self.do_GET()
+
+        elif post_data.get('name') is not None:
+            for i in data:
+                i = data[i]
+                print(i)
+                if (i != {}):
+                    if i['name'] == post_data['name']:
+                        print('found')
+                        found = True
+
+                        # update the html file
+                        soup = BeautifulSoup(open("index.html"), "html.parser")
+                        table = soup.find("tbody")
+                        # iterate through the table
+                        oneFound = False
+                        for j in table.find_all('tr'):
+                            if oneFound == False:
+                                # check if the id is the same
+                                if j.find('td').text == str(i['name']):
+                                    oneFound = True
+                                    j.decompose()
+                                    break
+
+                        with open("index.html", "w") as file:
+                            file.write(str(soup).replace(
+                                "&lt;", "<").replace("&gt;", ">"))
+                        message = {"message": "Film updated",
+                                   "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                        self.wfile.write(bytes(str(message), 'utf-8'))
+                        self.path = '/index.html'
+                        self.do_GET()
+        else:
+            message = {"message": "Param not found",
+                       "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+            self.wfile.write(bytes(str(message), 'utf-8'))
+            self.do_GET()
 
 
 server = HTTPServer((HOST, PORT), NeuralHttp)
