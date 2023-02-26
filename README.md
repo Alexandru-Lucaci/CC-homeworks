@@ -18,6 +18,7 @@
 /?"id='id'&newname='NewName'&newtype='NewType'&newfilm='NewFilm"
 ## DELETE
 /?name='NewName'
+
 /?id='14'
 ## Ngrok command 
 
