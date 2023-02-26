@@ -67,6 +67,13 @@ def get_data():
 
 
 # print(get_data())
+def maxId():
+    data = get_data()
+    id = 0
+    for key in data.keys():
+        if key != "#":
+            id = int(key)
+    return id+1
 
 
 class NeuralHttp(BaseHTTPRequestHandler):
@@ -188,7 +195,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
             table.append('<tr>')
             table.append(
                 f"""
-                <th scope="row">{len(data)}</th>
+                <th scope="row">{maxId()}</th>
                 <td>{post_data["name"]}</td>
                 <td>{post_data["type"]}</td>
                 <td>{post_data["film"]}</td>
@@ -203,6 +210,9 @@ class NeuralHttp(BaseHTTPRequestHandler):
             self.do_GET()
 
     def do_PUT(self):
+        # "name='alex'&newname='ceva'&newtype='da'&newfilm=ceva"
+        # id='1'&newname='ceva'&newtype='da'&newfilm=ceva
+
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
@@ -225,8 +235,154 @@ class NeuralHttp(BaseHTTPRequestHandler):
         headers = get_header()
         print(headers)
         data = get_data()
-        print('here')
-        # if(checkAlreadyExists(data,post_data))
+
+        # check if the first parameter is id
+        if post_data.get('id') is not None:
+            print('search by id')
+
+            print('data from id', data[post_data['id']])
+
+            if data[post_data['id']] is not None:
+                print('found')
+                # update the film
+                print(data)
+                # check if the newname is not empty
+                changed = {}
+                if post_data.get('newname') is not None and post_data['newname'] != '':
+
+                    changed['name'] = post_data['newname']
+                else:
+                    changed['name'] = data[post_data['id']]['name']
+                # check if the newtype is not empty
+                if post_data.get('newtype') is not None and post_data['newtype'] != '':
+                    changed['type'] = post_data['newtype']
+                else:
+                    changed['type'] = data[post_data['id']]['type']
+
+                # check if the newfilm is not empty
+                if post_data.get('newfilm') is not None and post_data['newfilm'] != '':
+                    changed['film'] = post_data['newfilm']
+                else:
+                    changed['film'] = data[post_data['id']]['film']
+
+                # update the html file
+                soup = BeautifulSoup(open("index.html"), "html.parser")
+                table = soup.find("tbody")
+                # add to the end the new entry
+                print(changed)
+                # iterate through the table
+                for i in table.find_all('tr'):
+                    # check if the id is the same
+                    if i.find('th').text == post_data['id']:
+
+                        # create a tag with the new values
+                        new_tag = soup.new_tag("td")
+                        new_tag.string = changed['name']
+                        # replace the old tag with the new one
+                        i.find_all('td')[0].replaceWith(new_tag)
+                        new_tag = soup.new_tag("td")
+                        new_tag.string = changed['type']
+                        i.find_all('td')[1].replaceWith(new_tag)
+                        # i.find_all('td')[1].text.replaceWith(changed['type'])
+                        new_tag = soup.new_tag("td")
+                        new_tag.string = changed['film']
+                        i.find_all('td')[2].replaceWith(new_tag)
+
+                        # i.find_all('td')[2].text.replaceWith(changed['film'])
+                        break
+
+                with open("index.html", "w") as file:
+                    file.write(str(soup).replace(
+                        "&lt;", "<").replace("&gt;", ">"))
+                message = {"message": "Film updated",
+                           "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                self.wfile.write(bytes(str(message), 'utf-8'))
+
+                print(soup.prettify())
+                self.path = '/index.html'
+                self.do_GET()
+            else:
+                print('not found')
+                message = {"message": "Film not found",
+                           "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                self.wfile.write(bytes(str(message), 'utf-8'))
+                self.do_GET()
+        elif post_data.get('name') is not None:
+            print('search by name')
+            # search by name
+            found = False
+            print(data)
+            for i in data:
+                i = data[i]
+                print(i)
+                if (i != {}):
+                    if i['name'] == post_data['name']:
+                        print('found')
+                        found = True
+                        # update the film
+                        print(data)
+                        # check if the newname is not empty
+                        changed = {}
+                        if post_data.get('newname') is not None and post_data['newname'] != '':
+
+                            changed['name'] = post_data['newname']
+                        else:
+                            changed['name'] = i['name']
+                        # check if the newtype is not empty
+                        if post_data.get('newtype') is not None and post_data['newtype'] != '':
+                            changed['type'] = post_data['newtype']
+                        else:
+                            changed['type'] = i['type']
+
+                        # check if the newfilm is not empty
+                        if post_data.get('newfilm') is not None and post_data['newfilm'] != '':
+                            changed['film'] = post_data['newfilm']
+                        else:
+                            changed['film'] = i['film']
+
+                        # update the html file
+                        soup = BeautifulSoup(open("index.html"), "html.parser")
+                        table = soup.find("tbody")
+                        # add to the end the new entry
+                        print(changed)
+                        # iterate through the table
+                        oneFound = False
+                        for j in table.find_all('tr'):
+                            if oneFound == False:
+                                # check if the id is the same
+                                if j.find('td').text == str(i['name']):
+                                    oneFound = True
+                                    print('found --- i m here ')
+                                    # create a tag with the new values
+                                    new_tag = soup.new_tag("td")
+                                    new_tag.string = changed['name']
+                                    # replace the old tag with the new one
+                                    j.find_all('td')[0].replaceWith(new_tag)
+                                    new_tag = soup.new_tag("td")
+                                    new_tag.string = changed['type']
+                                    j.find_all('td')[1].replaceWith(new_tag)
+                                    # i.find_all('td')[1].text.replaceWith(changed['type'])
+                                    new_tag = soup.new_tag("td")
+                                    new_tag.string = changed['film']
+                                    j.find_all('td')[2].replaceWith(new_tag)
+
+                                    # i.find_all('td')[2].text.replaceWith(changed['film'])
+                                    break
+
+                        with open("index.html", "w") as file:
+                            file.write(str(soup).replace(
+                                "&lt;", "<").replace("&gt;", ">"))
+                        message = {"message": "Film updated",
+                                   "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                        self.wfile.write(bytes(str(message), 'utf-8'))
+                        self.path = '/index.html'
+                        self.do_GET()
+                if not found:
+                    print('not found')
+                    message = {"message": "Film not found",
+                               "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                    self.wfile.write(bytes(str(message), 'utf-8'))
+                    self.do_GET()
 
 
 server = HTTPServer((HOST, PORT), NeuralHttp)
