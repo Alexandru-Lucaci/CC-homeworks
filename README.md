@@ -16,7 +16,9 @@
 /?"name='name'&newname='NewName'&newtype='NewType'&newfilm='NewFile'"
 
 /?"id='id'&newname='NewName'&newtype='NewType'&newfilm='NewFilm"
-
+## DELETE
+/?name='NewName'
+/?id='14'
 ## Ngrok command 
 
  ngrok.exe http 8000 
