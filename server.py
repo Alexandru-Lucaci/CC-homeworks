@@ -1,12 +1,30 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
-import time
+import time 
 import urllib
 import json
-from bs4 import BeautifulSoup
-import requests
-import tqdm
+import subprocess
+try:    
+    import regex as re
+except:
+    subprocess.run(["pip", "install", "regex"])
+    import regex as re
+try:
+    from bs4 import BeautifulSoup
+except:
+    subprocess.run(["pip", "install", "bs4"])
+    from bs4 import BeautifulSoup
+try:
+    import requests
+except:
+    subprocess.run(["pip", "install", "requests"])
+    import requests
+try:
+    import tqdm
+except:
+    subprocess.run(["pip", "install", "tqdm"])
+    import tqdm
 import cgi
-import requests
+
 # HOST = "192.168.100.34"
 HOST = "localhost"
 PORT = 8000
@@ -77,25 +95,36 @@ def maxId():
 
 
 class NeuralHttp(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+    def writeResponse(self,codeResponse, message, contentType):
+        self.send_response(codeResponse)
+        self.send_header('Content-type', contentType)
+        self.end_headers()
+        self.wfile.write(bytes(message, 'utf-8'))
 
+    def do_GET(self):
         if self.path == "/" or self.path == "/index.html" or self.path == "/server.py":
             self.path = f"/{HTML_FILE}"
-
-            self.end_headers()
             try:
                 file_to_open = open(self.path[1:]).read()
-                self.wfile.write(bytes(file_to_open, 'utf-8'))
-
+                self.writeResponse(200, file_to_open, 'text/html')
             except:
-                self.wfile.write(bytes("File not found", 'utf-8'))
-        elif self.path == "/get_data":
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
+                # create a response json
+                response = {
+                    "status": 404,
+                    "message": "File not found",
+                    "date": time.ctime(time.time())
+                }
+                self.writeResponse(404,response, 'application/json')
+
+        elif self.path == "/get_data" or self.path == "/get_data/" or self.path == "/films":
+
             data = get_data()
-            self.wfile.write(bytes(json.dumps(data), 'utf-8'))
+
+            self.writeResponse(200, json.dumps(data), 'application/json')
+        elif re.match(r"/\d+", self.path):
+            print('matched')
+            data = get_data()
+            self.writeResponse(200, json.dumps(data), 'application/json')
         elif self.path == "/favicon.ico":
             pass
         else:
