@@ -93,6 +93,12 @@ def maxId():
             id = int(key)
     return id+1
 
+def check_id_exsits(id):
+    print(f'the id is {id}')
+    data = get_data()
+    id = int(id)
+    return len([i for i in data.keys() if i!= '#' if int(i) == id > 0]) > 0    
+    
 
 class NeuralHttp(BaseHTTPRequestHandler):
     def writeResponse(self,codeResponse, message, contentType):
@@ -121,10 +127,55 @@ class NeuralHttp(BaseHTTPRequestHandler):
             data = get_data()
 
             self.writeResponse(200, json.dumps(data), 'application/json')
+        elif re.match(r"/\d+/\w+", self.path):
+            print('path starts ', self.path)
+            id = self.path.split('/')[1]
+            if (check_id_exsits(id)):
+                data = get_data()
+                path = self.path[1:].split('/')
+                path = path[1].split('&')
+                key_to_print=[]
+                print('Key to print: ', data[id].keys())
+                for i in range(0, len(path)):
+                    if path[i] in data[id].keys():
+                        # data = data[id][path[i]]
+                        print('a match')
+                        key_to_print.append(path[i])
+                
+                if len(key_to_print) == 0:
+                    response = {
+                        "status": 400,
+                        "message": "Params didn't match",
+                        "date": time.ctime(time.time())
+                    }
+                    self.writeResponse(400, response, 'application/json')
+                else:
+                    data = {key: data[id][key] for key in key_to_print}
+                    self.writeResponse(200, json.dumps(data), 'application/json')
+
+            else: 
+                response = {
+                    "status": 400,
+                    "message": "id does not exist",
+                    "date": time.ctime(time.time())
+                }
+                self.writeResponse(400, response, 'application/json')
         elif re.match(r"/\d+", self.path):
             print('matched')
-            data = get_data()
-            self.writeResponse(200, json.dumps(data), 'application/json')
+            print('path starts ', self.path)
+            id = self.path.split('/')[1]
+            if (check_id_exsits(id)):
+                print('id exists')
+                data = get_data()
+                self.writeResponse(200, json.dumps(data[id]), 'application/json')
+            else: 
+                response = {
+                    "status": 400,
+                    "message": "id does not exist",
+                    "date": time.ctime(time.time())
+                }
+                self.writeResponse(400, response, 'application/json')
+        
         elif self.path == "/favicon.ico":
             pass
         else:
