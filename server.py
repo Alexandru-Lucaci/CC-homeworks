@@ -239,9 +239,9 @@ class NeuralHttp(BaseHTTPRequestHandler):
                 #     self.wfile.write(bytes("File not found", 'utf-8'))
 
     def do_POST(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+        # self.send_response(200)
+        # self.send_header('Content-type', 'text/html')
+        # self.end_headers()
         # <--- Gets the size of data
         content_length = int(self.headers['Content-Length'])
         # <--- Gets the data itself
@@ -285,12 +285,13 @@ class NeuralHttp(BaseHTTPRequestHandler):
                 <td>{post_data["film"]}</td>
                 </tr>""")
 
-            print(soup.prettify())
+            # print(soup.prettify())
             with open("index.html", "w") as file:
                 file.write(str(soup).replace("&lt;", "<").replace("&gt;", ">"))
             message = {"message": "Film added",
                        "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
-            self.wfile.write(bytes(str(message), 'utf-8'))
+            # self.wfile.write(bytes(str(message), 'utf-8'))
+            self.writeResponse(201, json.dumps(message), 'application/json')
             # self.do_GET()
 
     def do_PUT(self):
@@ -381,7 +382,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                 message = {"message": "Film updated",
                            "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
                 self.wfile.write(bytes(str(message), 'utf-8'))
-
+                
                 print(soup.prettify())
                 self.path = '/index.html'
                 self.do_GET()
