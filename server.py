@@ -180,7 +180,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
             pass
         else:
             if (self.path.startswith('/get/')):
-                self.end_headers()
+                
                 print("Path is ", self.path)
                 params = self.path.split("?")[1].split("&")
                 params = [i.replace("%20", " ") for i in params]
@@ -194,6 +194,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                     if (param.lower() in header):
                         print("Param is ", param)
                         print(data)
+                        result = []
                         print(params[param])
                         for film in data.keys():
                             item = [j for j in data[film].items()
@@ -202,18 +203,21 @@ class NeuralHttp(BaseHTTPRequestHandler):
                             for tupla in item:
                                 if tupla[1] == params[param]:
                                     finded = True
-                                    self.wfile.write(
-                                        bytes(f"{data[film]}", 'utf-8'))
-
+                                    result.append(data[film])
+                                    # self.writeResponse(200, json.dumps(
+                                    #     data[film]), 'application/json')
+                                    # self.wfile.write(
+                                    #     bytes(f"{data[film]}", 'utf-8'))
+                        self.writeResponse(200, json.dumps(result), 'application/json')
                     else:
                         print('could not find param')
                 if (not finded):
                     self.wfile.write(bytes("Could not find the film", 'utf-8'))
-                else:
-                    time.sleep(5)
-                    self.path = "/"
-                    print(self.path)
-                    self.do_GET()
+                # else:
+                #     time.sleep(5)
+                #     self.path = "/"
+                #     print(self.path)
+                #     self.do_GET()
             else:
                 # false - there is a tag that i don't know
                 self.end_headers()
@@ -287,7 +291,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
             message = {"message": "Film added",
                        "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
             self.wfile.write(bytes(str(message), 'utf-8'))
-            self.do_GET()
+            # self.do_GET()
 
     def do_PUT(self):
         # "name='alex'"
@@ -463,7 +467,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                                "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
                     self.wfile.write(bytes(str(message), 'utf-8'))
                     self.do_GET()
-
+    
     def do_DELETE(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
