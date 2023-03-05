@@ -1,9 +1,9 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
-import time 
+import time
 import urllib
 import json
 import subprocess
-try:    
+try:
     import regex as re
 except:
     subprocess.run(["pip", "install", "regex"])
@@ -93,15 +93,16 @@ def maxId():
             id = int(key)
     return id+1
 
+
 def check_id_exsits(id):
     print(f'the id is {id}')
     data = get_data()
     id = int(id)
-    return len([i for i in data.keys() if i!= '#' if int(i) == id > 0]) > 0    
-    
+    return len([i for i in data.keys() if i != '#' if int(i) == id > 0]) > 0
+
 
 class NeuralHttp(BaseHTTPRequestHandler):
-    def writeResponse(self,codeResponse, message, contentType):
+    def writeResponse(self, codeResponse, message, contentType):
         self.send_response(codeResponse)
         self.send_header('Content-type', contentType)
         self.end_headers()
@@ -120,7 +121,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                     "message": "File not found",
                     "date": time.ctime(time.time())
                 }
-                self.writeResponse(404,response, 'application/json')
+                self.writeResponse(404, response, 'application/json')
 
         elif self.path == "/get_data" or self.path == "/get_data/" or self.path == "/films":
 
@@ -134,14 +135,14 @@ class NeuralHttp(BaseHTTPRequestHandler):
                 data = get_data()
                 path = self.path[1:].split('/')
                 path = path[1].split('&')
-                key_to_print=[]
+                key_to_print = []
                 print('Key to print: ', data[id].keys())
                 for i in range(0, len(path)):
                     if path[i] in data[id].keys():
                         # data = data[id][path[i]]
                         print('a match')
                         key_to_print.append(path[i])
-                
+
                 if len(key_to_print) == 0:
                     response = {
                         "status": 400,
@@ -151,9 +152,10 @@ class NeuralHttp(BaseHTTPRequestHandler):
                     self.writeResponse(400, response, 'application/json')
                 else:
                     data = {key: data[id][key] for key in key_to_print}
-                    self.writeResponse(200, json.dumps(data), 'application/json')
+                    self.writeResponse(200, json.dumps(
+                        data), 'application/json')
 
-            else: 
+            else:
                 response = {
                     "status": 400,
                     "message": "id does not exist",
@@ -167,20 +169,21 @@ class NeuralHttp(BaseHTTPRequestHandler):
             if (check_id_exsits(id)):
                 print('id exists')
                 data = get_data()
-                self.writeResponse(200, json.dumps(data[id]), 'application/json')
-            else: 
+                self.writeResponse(200, json.dumps(
+                    data[id]), 'application/json')
+            else:
                 response = {
                     "status": 400,
                     "message": "id does not exist",
                     "date": time.ctime(time.time())
                 }
                 self.writeResponse(400, response, 'application/json')
-        
+
         elif self.path == "/favicon.ico":
             pass
         else:
             if (self.path.startswith('/get/')):
-                
+
                 print("Path is ", self.path)
                 params = self.path.split("?")[1].split("&")
                 params = [i.replace("%20", " ") for i in params]
@@ -208,7 +211,8 @@ class NeuralHttp(BaseHTTPRequestHandler):
                                     #     data[film]), 'application/json')
                                     # self.wfile.write(
                                     #     bytes(f"{data[film]}", 'utf-8'))
-                        self.writeResponse(200, json.dumps(result), 'application/json')
+                        self.writeResponse(200, json.dumps(
+                            result), 'application/json')
                     else:
                         print('could not find param')
                 if (not finded):
@@ -249,50 +253,72 @@ class NeuralHttp(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length)
         post_data = post_data.decode('utf-8')
 
-        print(post_data)
-        post_data = post_data.replace(
-            ' ', '').replace('"', '').replace("'", '')
-        post_data = post_data.split("&")
-        post_data = [i.replace("+", " ") for i in post_data]
-        post_data = {i.split("=")[0]: i.split("=")[1] for i in post_data}
+        print('Print the post data ', post_data)
+        print(self.path)
+        if post_data == None:
+            post_data = self.path.split('?')[1]
+        if post_data:
+            if post_data.startswith('----------------------------'):
+                post_data = post_data.split('name=')[1:]
+                print(f'{post_data} is the post data')
+                newData = {}
+                for i in range(0, len(post_data)):
+                    key = post_data[i].split('\r\n\r\n')[0]
+                    key = key.replace('"', '').replace("'", '')
+                    value = post_data[i].split('\r\n\r\n')[1]
+                    value = value.split('\r\n')[0]
+                    newData[key] = value
+                post_data = newData
+            else:
+                post_data = post_data.replace(
+                    ' ', '').replace('"', '').replace("'", '')
+                post_data = post_data.split("&")
+                post_data = [i.replace("+", " ") for i in post_data]
+                post_data = {i.split("=")[0]: i.split("=")[1]
+                             for i in post_data}
 
-        print(post_data)
+            print("Final datae ", post_data)
 
-        headers = get_header()
-        print(headers)
-        data = get_data()
-# "name": "The Godfather", "type": "Crime", "film": "Drama"
-        existed = False
-        # check if the checkbox is checked
-        if post_data.get('checked') is not None:
-            # check if the film already exists
-            if (checkAlreadyExists(data, post_data) and post_data["checked"]):
-                message = {"message": "Film already exists",
+            headers = get_header()
+
+            print(headers)
+            data = get_data()
+    # "name": "The Godfather", "type": "Crime", "film": "Drama"
+            existed = False
+            # check if the checkbox is checked
+            if post_data.get('checked') is not None:
+                # check if the film already exists
+                if (checkAlreadyExists(data, post_data) and post_data["checked"]):
+                    message = {"message": "Film already exists",
+                               "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                    self.wfile.write(bytes(str(message), 'utf-8'))
+                    self.do_GET()
+                    existed = True
+            if not existed:
+                soup = BeautifulSoup(open("index.html"), "html.parser")
+                table = soup.find("tbody")
+                # add to the end the new entry
+                table.append('<tr>')
+                table.append(
+                    f"""
+                    <th scope="row">{maxId()}</th>
+                    <td>{post_data["name"]}</td>
+                    <td>{post_data["type"]}</td>
+                    <td>{post_data["film"]}</td>
+                    </tr>""")
+
+                # print(soup.prettify())
+                with open("index.html", "w") as file:
+                    file.write(str(soup).replace(
+                        "&lt;", "<").replace("&gt;", ">"))
+                message = {"message": "Film added",
                            "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
-                self.wfile.write(bytes(str(message), 'utf-8'))
-                self.do_GET()
-                existed = True
-        if not existed:
-            soup = BeautifulSoup(open("index.html"), "html.parser")
-            table = soup.find("tbody")
-            # add to the end the new entry
-            table.append('<tr>')
-            table.append(
-                f"""
-                <th scope="row">{maxId()}</th>
-                <td>{post_data["name"]}</td>
-                <td>{post_data["type"]}</td>
-                <td>{post_data["film"]}</td>
-                </tr>""")
-
-            # print(soup.prettify())
-            with open("index.html", "w") as file:
-                file.write(str(soup).replace("&lt;", "<").replace("&gt;", ">"))
-            message = {"message": "Film added",
-                       "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
-            # self.wfile.write(bytes(str(message), 'utf-8'))
-            self.writeResponse(201, json.dumps(message), 'application/json')
-            # self.do_GET()
+                # self.wfile.write(bytes(str(message), 'utf-8'))
+                self.writeResponse(201, json.dumps(
+                    message), 'application/json')
+                # self.do_GET()
+        else:
+            print(' i am here')
 
     def do_PUT(self):
         # "name='alex'"
@@ -382,7 +408,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                 message = {"message": "Film updated",
                            "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
                 self.wfile.write(bytes(str(message), 'utf-8'))
-                
+
                 print(soup.prettify())
                 self.path = '/index.html'
                 self.do_GET()
@@ -468,7 +494,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                                "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
                     self.wfile.write(bytes(str(message), 'utf-8'))
                     self.do_GET()
-    
+
     def do_DELETE(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
