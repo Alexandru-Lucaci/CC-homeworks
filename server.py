@@ -255,8 +255,10 @@ class NeuralHttp(BaseHTTPRequestHandler):
 
         print('Print the post data ', post_data)
         print(self.path)
-        if post_data == None:
+        if post_data == '':
             post_data = self.path.split('?')[1]
+
+        print('final post data ', post_data)
         if post_data:
             if post_data.startswith('----------------------------'):
                 post_data = post_data.split('name=')[1:]
