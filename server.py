@@ -127,7 +127,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                     "message": "File not found",
                     "date": time.ctime(time.time())
                 }
-                self.writeResponse(404, response, 'application/json')
+                self.writeResponse(404, json.dumps(response), 'application/json')
 
         elif self.path == "/get_data" or self.path == "/get_data/" or self.path == "/films":
 
@@ -310,7 +310,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                     message = {"message": "Film already exists",
                                "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
                     # self.wfile.write(bytes(str(message), 'utf-8'))
-                    self.writeResponse(409, message, 'application/json')
+                    self.writeResponse(409, json.dumps(message), 'application/json')
                     # self.do_GET()
                     existed = True
             if not existed:
@@ -739,9 +739,16 @@ class NeuralHttp(BaseHTTPRequestHandler):
         # check if the first parameter is id
         if post_data.get('id') is not None:
             print('search by id')
-
-            print('data from id', data[post_data['id']])
-
+            try:
+                print('data from id', data[post_data['id']])
+            except KeyError as e :
+                print('not found')
+                message = {"message": "Film not found",
+                           "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                # self.wfile.write(bytes(str(message), 'utf-8'))
+                self.writeResponse(404, json.dumps(
+                    message), 'application/json')
+                
             if data[post_data['id']] is not None:
                 print('found')
                 # update the film
@@ -936,33 +943,39 @@ class NeuralHttp(BaseHTTPRequestHandler):
         data = get_data()
         print(data)
         if post_data.get('id') is not None:
-            if data[post_data['id']] is not None:
-                soup = BeautifulSoup(open("index.html"), "html.parser")
-                table = soup.find("tbody")
-                # iterate through the table
-                for i in table.find_all('tr'):
-                    # check if the id is the same
-                    if i.find('th').text == post_data['id']:
-                        i.decompose()
-                        break
+            try:
+                if data[post_data['id']] is not None:
+                    soup = BeautifulSoup(open("index.html"), "html.parser")
+                    table = soup.find("tbody")
+                    # iterate through the table
+                    for i in table.find_all('tr'):
+                        # check if the id is the same
+                        if i.find('th').text == post_data['id']:
+                            i.decompose()
+                            break
 
-                with open("index.html", "w") as file:
-                    file.write(str(soup).replace(
-                        "&lt;", "<").replace("&gt;", ">"))
-                    message = {"message": "Film deleted",
-                               "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                    with open("index.html", "w") as file:
+                        file.write(str(soup).replace(
+                            "&lt;", "<").replace("&gt;", ">"))
+                        message = {"message": "Film deleted",
+                                "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                        # self.wfile.write(bytes(str(message), 'utf-8'))
+                        self.path = '/index.html'
+                        self.writeResponse(200, json.dumps(message), 'application/json')
+                        # self.do_GET()
+                else:
+                    print('not found')
+                    message = {"message": "Film not found",
+                            "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
                     # self.wfile.write(bytes(str(message), 'utf-8'))
-                    self.path = '/index.html'
-                    self.writeResponse(200, message, 'application/json')
+                    self.writeResponse(404, json.dumps(message), 'application/json')
                     # self.do_GET()
-            else:
+            except KeyError:
                 print('not found')
                 message = {"message": "Film not found",
-                           "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
-                self.wfile.write(bytes(str(message), 'utf-8'))
-                self.writeResponse(404, message, 'application/json')
-                # self.do_GET()
-
+                        "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
+                # self.wfile.write(bytes(str(message), 'utf-8'))
+                self.writeResponse(404, json.dumps(message), 'application/json')
         elif post_data.get('name') is not None:
             for i in data:
                 i = data[i]
@@ -991,13 +1004,13 @@ class NeuralHttp(BaseHTTPRequestHandler):
                         message = {"message": "Film deleted",
                                    "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
                         # self.wfile.write(bytes(str(message), 'utf-8'))
-                        self.writeResponse2(200, message, 'application/json')
+                        self.writeResponse2(200, json.dumps(message), 'application/json')
                         self.path = '/index.html'
                         # self.do_GET()
         else:
             message = {"message": "Param not found",
                        "data": f"{time.strftime('%Y-%m-%d %H: %M: %S', time.localtime(time.time()))}"}
-            self.wfile.write(bytes(str(message), 'utf-8'))
+            # self.wfile.write(bytes(str(message), 'utf-8'))
             self.writeResponse(404, message, 'application/json')
             # self.do_GET()
 
