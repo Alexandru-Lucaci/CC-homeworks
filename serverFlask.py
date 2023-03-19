@@ -9,9 +9,12 @@ except ImportError:
 # print(os.path.dirname(sys.executable))
 try:
     from flask import Flask,request
+    from flask_cors import CORS
 except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "flask"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "flask-cors"])
     from flask import Flask
+    from flask_cors import CORS
     
     
 app = Flask(__name__)
@@ -164,12 +167,13 @@ def getFilterdID(id,name):
 @app.route("/get/<key>=<value>")
 def getType(key,value):
     print("our values are", key,value)
-    response = requests.post(f"http://localhost:8000/get/?{key}={value}")
-    
+    response = requests.get(f"http://localhost:8000/get/?{key}={value}")
+    # response.headers.add('Access-Control-Allow-Origin', '*')
     print('the response is',response)
     data = response.content
     print(data)
     return data
 
 if __name__ == "__main__":
+    CORS(app)
     app.run(debug=True)
