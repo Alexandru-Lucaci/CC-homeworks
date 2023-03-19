@@ -175,15 +175,18 @@ class NeuralHttp(BaseHTTPRequestHandler):
             if (check_id_exsits(id)):
                 print('id exists')
                 data = get_data()
-                self.writeResponse(200, json.dumps(
-                    data[id]), 'application/json')
+                print(data[id])
+                info = data[id]
+                print(info)
+                self.writeResponse(200,json.dumps(info), 'application/json') 
+                    
             else:
                 response = {
                     "status": 400,
                     "message": "id does not exist",
                     "date": time.ctime(time.time())
                 }
-                self.writeResponse(400, response, 'application/json')
+                self.writeResponse(400, json.dump(response), 'application/json')
 
         elif self.path == "/favicon.ico":
             pass
@@ -222,7 +225,13 @@ class NeuralHttp(BaseHTTPRequestHandler):
                     else:
                         print('could not find param')
                 if (not finded):
-                    self.wfile.write(bytes("Could not find the film", 'utf-8'))
+                    response = {
+                    "status": 400,
+                    "message": "Could not find the film",
+                    "date": time.ctime(time.time())
+                    }
+                    self.writeResponse(400, json.dumps(response), 'application/json')
+                    # self.wfile.write(bytes("Could not find the film", 'utf-8'))
                 # else:
                 #     time.sleep(5)
                 #     self.path = "/"
