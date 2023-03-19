@@ -24,3 +24,8 @@
 
  ngrok.exe http 8000 
  
+## For client
+
+degit sveltejs/template myproject
+
+npm run dev
