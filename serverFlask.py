@@ -31,9 +31,27 @@ def log(msg,ID,err = False):
         print(f"[Error][{ID}]: {msg}")
     else:
         print(f"[{ID}]: {msg}")
+@app.route("/put/", methods=["OPTIONS", "PUT"])
+def PutWithParams():
+    print("we are in putttttt")
+    vars = request.args
+    string= "/?"
+ 
+    for i in vars:
+        string += f"{i}={vars[i]}&"
+    string = string[:-1]
+    print(string)
+    headers = {'Content-Type': 'application/json'}
+    response = requests.put(f"http://localhost:8000{string}",headers=headers)
+    print("Done")
+    try:
+        data = response.json()
+    except Exception as e:
+        data = response.content
+    print(data)
+    return data
 
-
-@app.route("/",methods=[ "POST", "PUT","PATCH","DELETE"])
+@app.route("/",methods=[ "POST", "PUT","PATCH","DELETE","OPTIONS"])
 def PostWithParams1():
     if request.method == 'POST':
         # print("request is", request.args)
@@ -129,6 +147,50 @@ def PostWithParams1():
         print("Final data is ", post_data)
         headers = {'Content-Type': 'application/json'}
         response = requests.delete(f"http://localhost:8000", headers=headers, data=data)
+        try:
+            return response.json()
+        except:
+            return response.content
+    elif request.method == 'OPTIONS':
+        data = request.get_data()
+        print("data getting from post is ")
+        print(data)
+        vars = request.args
+        # generate the string
+        string= "/?"
+        # iterate thru vars
+        for i in vars:
+            string += f"{i}={vars[i]}&"
+        string = string[:-1]
+        log(f'OPTIONS request received {request.args}', 'OPTIONS')  
+        post_data = data.decode('utf-8')
+        if post_data:
+            if post_data.startswith('----------------------------'):
+                post_data = post_data.split('name=')[1:]
+                print(f'{post_data} is the post data')
+                newData = {}
+                for i in range(0, len(post_data)):
+                    key = post_data[i].split('\r\n\r\n')[0]
+                    key = key.replace('"', '').replace("'", '')
+                    value = post_data[i].split('\r\n\r\n')[1]
+                    value = value.split('\r\n')[0]
+                    newData[key] = value
+                post_data = newData
+            else:
+                post_data = post_data.replace(
+                    ' ', '').replace('"', '').replace("'", '')
+                post_data = post_data.split("&")
+                post_data = [i.replace("+", " ") for i in post_data]
+                post_data = {i.split("=")[0]: i.split("=")[1]
+                                for i in post_data}
+        if post_data!='':
+            print("Final data is ", post_data)
+            headers = {'Content-Type': 'application/json'}
+            response = requests.delete(f"http://localhost:8000", headers=headers, data=data)
+        else:
+            print("Final data is ", post_data)
+            headers = {'Content-Type': 'application/json'}
+            response = requests.delete(f"http://localhost:8000{string}")
         try:
             return response.json()
         except:

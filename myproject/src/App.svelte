@@ -1,15 +1,15 @@
 <script>
-  import { each } from "svelte/internal";
+  	import { each } from "svelte/internal";
 
   	// export let name;
-	let firstName = 'John';
-	let lastName = 'Doe';
+
 	let table = '';
 	let viewAllTable = 'none';
 	let viewFilterButton = 'none';
 	let viewFindButton = 'none';
 	let viewAddButton = 'none';
 	let viewDelButton = 'none';
+	let viewPutButton = 'none';
 	let idFind = '';
 	let findData = new Map();
 	
@@ -22,11 +22,17 @@
 	let addDataName = '';
 	let addDataType = '';
 	let addDataFilm = '';
-	let addDataCheck = 'on';	
+	let addDataCheck = '';	
 
 	let delDataName = '';
 	let delDataId = '';
-	
+
+	let putDataName = '';
+	let putDataNewName = '';
+	let putDataType = '';
+	let putDataFilm = '';
+	let putDataId = '';
+
 	let beltColour='black';
 	const handle_click = () => {
 		beltColour = 'orange';
@@ -39,6 +45,7 @@
 		viewFilterButton = 'none';
 		viewFindButton = 'none';
 		viewDelButton = 'none';
+		viewPutButton = 'none';
 		if (viewAllTable == 'none') {
 			viewAllTable = 'block';
 		} else {
@@ -65,6 +72,7 @@
 	};
 	const filterbtnPressed = () => {
 		viewAddButton = 'none';
+		viewPutButton = 'none';
 		viewAllTable = 'none';
 		viewFindButton = 'none';
 		viewDelButton = 'none';
@@ -74,6 +82,7 @@
 	};
 	const findAfilm = () => {
 		viewAddButton = 'none';
+		viewPutButton = 'none';
 		viewDelButton = 'none';
 		viewAllTable = 'none';
 		viewFilterButton = 'none';
@@ -182,9 +191,6 @@
 		fetch("http://localhost:5000/get/"+stringPar)
 		.then(response => response.json())
 		.then(data => {
-				// for (let [key,value] of Object.entries(data)) {
-				// 	table+=`<tr><th scope="row">${key}</th><td>${value.name}</td><td>${value.type}</td><td>${value.genre}</td></tr>`;
-				// }
 				console.log(table)
 			findData=data;
 			// check if the data is empty
@@ -202,6 +208,7 @@
 		viewFilterButton = 'none';
 		viewFindButton = 'none';
 		viewDelButton = 'none';
+		viewPutButton = 'none';
 		viewAddButton = 'block';
 	};
 	const delBtnPressed = () => {
@@ -210,6 +217,7 @@
 		viewFindButton = 'none';
 		viewDelButton = 'block';
 		viewAddButton = 'none';
+		viewPutButton = 'none';
 	};
 	const tryAddFilm = () => {
 		var stringPar =""
@@ -266,13 +274,21 @@
 		delDataName = event.target.value;
 		console.log(delDataName);
 	};
+	const handDelId = (event) => {
+		delDataId = event.target.value;
+		console.log(delDataId);
+	};
 	const tryDelFilm = () => {
 		var stringPar =""
 		if(delDataName != ''){
 			stringPar += "name="+delDataName+"&";
 		}
+		else
+		{
+			stringPar += "id="+delDataId+"&";
+		}
 		stringPar = stringPar.slice(0, -1);
-		fetch("http://localhost:5000/delete/?"+stringPar,{method : 'DELETE'})
+		fetch("http://localhost:5000?"+stringPar,{method : 'DELETE'})
 		.then(response => response.json())
 		.then(data => {
 				// for (let [key,value] of Object.entries(data)) {
@@ -289,7 +305,73 @@
 			return [];
 		});
 	};
+	const handPutName = (event) => {
+		putDataName = event.target.value;
+		console.log(putDataName);
+	};
+	const handPutId = (event) => {
+		putDataId = event.target.value;
+		console.log(putDataId);
+	};
+	const handPutType = (event) => {
+		putDataType = event.target.value;
+		console.log(putDataType);
+	};
+	const handPutFilm = (event) => {
+		putDataFilm = event.target.value;
+		console.log(putDataFilm);
+	};
+	const handPutNewName = (event) => {
+		putDataNewName = event.target.value;
+		console.log(putDataNewName);
+	};
+	const tryPutFilm = () => {
+		var stringPar =""
+		if(putDataName != ''){
+			stringPar += "name="+putDataName+"&";
+		}
+		else
+		{
+			stringPar += "id="+putDataId+"&";
+		}
+		if(putDataNewName != ''){
+			stringPar += "newName="+putDataNewName+"&";
+		}
+		if(putDataType != ''){
+			stringPar += "type="+putDataType+"&";
+		}
+		if(putDataFilm != ''){
+			stringPar += "film="+putDataFilm+"&";
+		}
 
+		stringPar = stringPar.slice(0, -1);
+		console.log(stringPar)
+		fetch("http://localhost:5000/put/?"+stringPar,{method : 'PUT'})
+		.then(response => response.json())
+		.then(data => {
+				// for (let [key,value] of Object.entries(data)) {
+				// 	table+=`<tr><th scope="row">${key}</th><td>${value.name}</td><td>${value.type}</td><td>${value.genre}</td></tr>`;
+				// }
+				console.log(table)
+			findData=data;
+			// check if the data is empty
+
+			console.log(findData)
+			// console.log(table)
+		}).catch(error => {
+			console.log(error);
+			return [];
+		});
+	};
+	
+	const putBtnPressed = () => {
+		viewAllTable = 'none';
+		viewFilterButton = 'none';
+		viewFindButton = 'none';
+		viewDelButton = 'none';
+		viewAddButton = 'none';
+		viewPutButton = 'block';
+	};
 </script>
 
 <main>
@@ -299,7 +381,7 @@
 		  <button class="btn btn-sm btn-outline-secondary" type="button" on:click={findAfilm}>Find button</button>
 		  <button class="btn btn-sm btn-outline-secondary" type="button" on:click={filterbtnPressed}>Filter button</button>
 		  <button class="btn btn-sm btn-outline-secondary" type="button" on:click={addBtnPressed}>Add button</button>
-		  <button class="btn btn-sm btn-outline-secondary" type="button">Update button</button>
+		  <button class="btn btn-sm btn-outline-secondary" type="button" on:click={putBtnPressed}>Update button</button>
 		  <button class="btn btn-sm btn-outline-secondary" type="button" on:click={delBtnPressed}>Delete button</button>
 		</form>
 	  </nav>
@@ -376,7 +458,7 @@
 			<h1>Input a film</h1>
 			<p>Here we can input a film</p>
 		</div>
-		<form action="" method="post">
+		<form action="" method="">
 			<div class="mb-3">
 				<label class="form-label" for="exampleInputNameFilm" >Name of the film</label>
 				<input class="form-control" id="exampleInputNameFilm" name="name" type="text" on:input={handAddName}/>
@@ -404,12 +486,92 @@
 			<h1>Deletre a film</h1>
 			<p>Here we can input a film</p>
 			</div>
-		<form action="" method="DELETE">
+		<form action="" >
 			<div class="mb-3">
 				<label class="form-label" for="exampleInputNameFilm" >Name of the film</label>
 				<input class="form-control" id="exampleInputNameFilm" name="name" type="text" on:input={handDelName}/>
 			</div>
 			<button class="btn btn-primary" on:click={tryDelFilm}>Introdu</button>
+		</form>
+	</div>
+	<br>
+	<div style="display:{viewDelButton}">
+		<div class="container-fluid p-5 bg-primary text-white text-center">
+			<h1>Deletre a film</h1>
+			<p>Here we can input a film</p>
+			</div>
+		<form action="" method="">
+			<div class="mb-3">
+				<label class="form-label" for="exampleInputNameFilm" >ID of the film</label>
+				<input class="form-control" id="exampleInputNameFilm" name="id" type="text" on:input={handDelId}/>
+			</div>
+			<button class="btn btn-primary" on:click={tryDelFilm}>Introdu</button>
+		</form>
+	</div>
+
+	<div style="display:{viewPutButton}">
+		<div class="container-fluid p-5 bg-primary text-white text-center">
+			<h1>Modify </h1>
+			<p>Here we can modify a film</p>
+		</div>
+
+
+		<form action="" >
+			<div class="mb-3">
+				<label class="form-label" for="exampleInputNameFilm" >Name of the film</label>
+				<input class="form-control" id="exampleInputNameFilm" name="name" type="text" on:input={handPutName}/>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="exampleInputNameFilm" >New Name of the film</label>
+				<input class="form-control" id="exampleInputNameFilm" name="newname" type="text" on:input={handPutNewName}/>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="exampleInputType">
+					New Type of the film
+				</label>
+				<input class="form-control" id="exampleInputType" name="newtype" type="text" on:input={handPutType}/>
+			</div>
+		<div class="mb-3">
+			<label class="form-label" for="exampleInputType">New Film genre </label>
+			<input class="form-control" id="exampleInputType" name="newfilm" type="text" on:input={handPutFilm}/>
+		</div>
+		<!-- <div class="mb-3 form-check">
+			<input class="form-check-input" id="exampleCheck1" name="checked" type="checkbox" on:input={handAddCheck}/>
+			<label class="form-check-label" for="exampleCheck1">Check if already exists</label>
+		</div> -->
+		<button class="btn btn-primary" on:click={tryPutFilm}>Introdu</button>
+		</form>
+	</div>
+	<div style="display:{viewPutButton}">
+		<div class="container-fluid p-5 bg-primary text-white text-center">
+			<h1>Modify </h1>
+			<p>Here we can modify a film</p>
+		</div>
+
+		<form action="" >
+			<div class="mb-3">
+				<label class="form-label" for="exampleInputNameFilm" >Id of the film</label>
+				<input class="form-control" id="exampleInputNameFilm" name="name" type="text" on:input={handPutId}/>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="exampleInputNameFilm" >New Name of the film</label>
+				<input class="form-control" id="exampleInputNameFilm" name="newname" type="text" on:input={handPutNewName}/>
+			</div>
+			<div class="mb-3">
+				<label class="form-label" for="exampleInputType">
+					New Type of the film
+				</label>
+				<input class="form-control" id="exampleInputType" name="newtype" type="text" on:input={handPutType}/>
+			</div>
+		<div class="mb-3">
+			<label class="form-label" for="exampleInputType">New Film genre </label>
+			<input class="form-control" id="exampleInputType" name="newfilm" type="text" on:input={handPutFilm}/>
+		</div>
+		<!-- <div class="mb-3 form-check">
+			<input class="form-check-input" id="exampleCheck1" name="checked" type="checkbox" on:input={handAddCheck}/>
+			<label class="form-check-label" for="exampleCheck1">Check if already exists</label>
+		</div> -->
+		<button class="btn btn-primary" on:click={tryPutFilm}>Introdu</button>
 		</form>
 	</div>
 	

@@ -431,7 +431,7 @@ class NeuralHttp(BaseHTTPRequestHandler):
                 # self.wfile.write(bytes(str(message), 'utf-8'))
                 self.writeResponse(200, json.dumps(
                     message), 'application/json')
-                print(soup.prettify())
+                # print(soup.prettify())
                 self.path = '/index.html'
                 # self.do_GET()
             else:
