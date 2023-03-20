@@ -458,7 +458,7 @@
 			<h1>Input a film</h1>
 			<p>Here we can input a film</p>
 		</div>
-		<form action="" method="">
+		<form action="" method="POST" on:submit|preventDefault={tryAddFilm}>
 			<div class="mb-3">
 				<label class="form-label" for="exampleInputNameFilm" >Name of the film</label>
 				<input class="form-control" id="exampleInputNameFilm" name="name" type="text" on:input={handAddName}/>
@@ -477,13 +477,13 @@
 			<input class="form-check-input" id="exampleCheck1" name="checked" type="checkbox" on:input={handAddCheck}/>
 			<label class="form-check-label" for="exampleCheck1">Check if already exists</label>
 		</div>
-		<button class="btn btn-primary" on:click={tryAddFilm}>Introdu</button>
+		<button class="btn btn-primary"  type="submit">Introdu</button>
 		</form>
 	</div>
 
 	<div style="display:{viewDelButton}">
 		<div class="container-fluid p-5 bg-primary text-white text-center">
-			<h1>Deletre a film</h1>
+			<h1>Delete a film</h1>
 			<p>Here we can input a film</p>
 			</div>
 		<form action="" >
@@ -497,7 +497,7 @@
 	<br>
 	<div style="display:{viewDelButton}">
 		<div class="container-fluid p-5 bg-primary text-white text-center">
-			<h1>Deletre a film</h1>
+			<h1>Delete a film</h1>
 			<p>Here we can input a film</p>
 			</div>
 		<form action="" method="">
@@ -542,7 +542,8 @@
 		<button class="btn btn-primary" on:click={tryPutFilm}>Introdu</button>
 		</form>
 	</div>
-	<div style="display:{viewPutButton}">
+	<div style="display:{viewPutButton}" on:submit|preventDefault={tryPutFilm}>
+		
 		<div class="container-fluid p-5 bg-primary text-white text-center">
 			<h1>Modify </h1>
 			<p>Here we can modify a film</p>
@@ -571,7 +572,7 @@
 			<input class="form-check-input" id="exampleCheck1" name="checked" type="checkbox" on:input={handAddCheck}/>
 			<label class="form-check-label" for="exampleCheck1">Check if already exists</label>
 		</div> -->
-		<button class="btn btn-primary" on:click={tryPutFilm}>Introdu</button>
+		<button class="btn btn-primary" >Introdu</button>
 		</form>
 	</div>
 	
